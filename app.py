@@ -1,243 +1,198 @@
-import streamlit as st 
-import pickle 
+import streamlit as st
+import pickle
 import os
 from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title="Mulitple Disease Prediction",layout="wide", page_icon="👨‍🦰🤶")
+# Set page configuration
+st.set_page_config(page_title="Multiple Disease Prediction", layout="wide", page_icon="🩺")
 
+# Load models
 working_dir = os.path.dirname(os.path.abspath(__file__))
+diabetes_model = pickle.load(open(f'{working_dir}/models/diabetes_models/knn_diabetes.pkl', 'rb'))
+heart_disease_model = pickle.load(open(f'{working_dir}/models/heart_models/lg_model.pkl', 'rb'))
+kidney_disease_model = pickle.load(open(f'{working_dir}/models/kidney_models/gb_kindey.pkl', 'rb'))
 
-diabetes_model = pickle.load(open(f'{working_dir}/models/diabetes_models/knn_diabetes.pkl','rb'))
-heart_disease_model = pickle.load(open(f'{working_dir}/models/heart_models/lg_model.pkl','rb'))
-kidney_disease_model = pickle.load(open(f'{working_dir}/models/kidney_models/gb_kindey.pkl','rb'))
+# Custom CSS for styling
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content {background-color: #f0f2f6;}
+    .main {background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);}
+    .css-18e3th9 {padding-top: 0px;} /* Remove the top padding */
+    .stButton>button {border-radius: 10px; background-color: #4CAF50; color: white; padding: 10px 24px;}
+    </style>
+    """, unsafe_allow_html=True
+)
 
-NewBMI_Overweight=0
-NewBMI_Underweight=0
-NewBMI_Obesity_1=0
-NewBMI_Obesity_2=0 
-NewBMI_Obesity_3=0
-NewInsulinScore_Normal=0 
-NewGlucose_Low=0
-NewGlucose_Normal=0 
-NewGlucose_Overweight=0
-NewGlucose_Secret=0
-
+# Sidebar menu
 with st.sidebar:
-    selected = option_menu("Mulitple Disease Prediction", 
-                ['Diabetes Prediction',
-                 'Heart Disease Prediction',
-                 'Kidney Disease Prediction'],
-                 menu_icon='hospital-fill',
-                 icons=['activity','heart', 'person'],
-                 default_index=0)
+    selected = option_menu(
+        "Multiple Disease Prediction",
+        ['Diabetes Prediction', 'Heart Disease Prediction', 'Kidney Disease Prediction'],
+        menu_icon='hospital-fill',
+        icons=['activity', 'heart', 'person'],
+        default_index=0
+    )
 
+# Diabetes Prediction Section
 if selected == 'Diabetes Prediction':
     st.title("Diabetes Prediction Using Machine Learning")
-
+    st.write("### Please fill out the details below to check for diabetes.")
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        Pregnancies = st.text_input("Number of Pregnancies")
+        Pregnancies = st.number_input("Number of Pregnancies", min_value=0, step=1)
     with col2:
-        Glucose = st.text_input("Glucose Level")
+        Glucose = st.number_input("Glucose Level", min_value=0.0, format="%.2f")
     with col3:
-        BloodPressure = st.text_input("BloodPressure Value")
+        BloodPressure = st.number_input("Blood Pressure Value", min_value=0.0, format="%.2f")
     with col1:
-        SkinThickness = st.text_input("SkinThickness Value")
+        SkinThickness = st.number_input("Skin Thickness Value", min_value=0.0, format="%.2f")
     with col2:
-        Insulin = st.text_input("Insulin Value")
+        Insulin = st.number_input("Insulin Value", min_value=0.0, format="%.2f")
     with col3:
-        BMI = st.text_input("BMI Value")
+        BMI = st.number_input("BMI Value", min_value=0.0, format="%.2f")
     with col1:
-        DiabetesPedigreeFunction = st.text_input("DiabetesPedigreeFunction Value")
+        DiabetesPedigreeFunction = st.number_input("Diabetes Pedigree Function Value", min_value=0.0, format="%.2f")
     with col2:
-        Age = st.text_input("Age")
-    diabetes_result = ""
+        Age = st.number_input("Age", min_value=0, step=1)
+    
     if st.button("Diabetes Test Result"):
-        if float(BMI)<=18.5:
-            NewBMI_Underweight = 1
-        elif 18.5 < float(BMI) <=24.9:
-            pass
-        elif 24.9<float(BMI)<=29.9:
-            NewBMI_Overweight =1
-        elif 29.9<float(BMI)<=34.9:
-            NewBMI_Obesity_1 =1
-        elif 34.9<float(BMI)<=39.9:
-            NewBMI_Obesity_2=1
-        elif float(BMI)>39.9:
-            NewBMI_Obesity_3 = 1
+        # BMI Categories
+        NewBMI_Underweight = 1 if BMI <= 18.5 else 0
+        NewBMI_Overweight = 1 if 24.9 < BMI <= 29.9 else 0
+        NewBMI_Obesity_1 = 1 if 29.9 < BMI <= 34.9 else 0
+        NewBMI_Obesity_2 = 1 if 34.9 < BMI <= 39.9 else 0
+        NewBMI_Obesity_3 = 1 if BMI > 39.9 else 0
         
-        if 16<=float(Insulin)<=166:
-            NewInsulinScore_Normal = 1
-
-        if float(Glucose)<=70:
-            NewGlucose_Low = 1
-        elif 70<float(Glucose)<=99:
-            NewGlucose_Normal = 1
-        elif 99<float(Glucose)<=126:
-            NewGlucose_Overweight = 1
-        elif float(Glucose)>126:
-            NewGlucose_Secret = 1
-
-        user_input=[Pregnancies,Glucose,BloodPressure,SkinThickness,Insulin,
-                    BMI,DiabetesPedigreeFunction,Age, NewBMI_Underweight,
-                    NewBMI_Overweight,NewBMI_Obesity_1,
-                    NewBMI_Obesity_2,NewBMI_Obesity_3,NewInsulinScore_Normal, 
-                    NewGlucose_Low,NewGlucose_Normal, NewGlucose_Overweight,
-                    NewGlucose_Secret]
+        # Insulin Score
+        NewInsulinScore_Normal = 1 if 16 <= Insulin <= 166 else 0
         
-        user_input = [float(x) for x in user_input]
+        # Glucose Levels
+        NewGlucose_Low = 1 if Glucose <= 70 else 0
+        NewGlucose_Normal = 1 if 70 < Glucose <= 99 else 0
+        NewGlucose_Overweight = 1 if 99 < Glucose <= 126 else 0
+        NewGlucose_Secret = 1 if Glucose > 126 else 0
+
+        user_input = [
+            Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI,
+            DiabetesPedigreeFunction, Age, NewBMI_Underweight, NewBMI_Overweight,
+            NewBMI_Obesity_1, NewBMI_Obesity_2, NewBMI_Obesity_3, NewInsulinScore_Normal,
+            NewGlucose_Low, NewGlucose_Normal, NewGlucose_Overweight, NewGlucose_Secret
+        ]
+
+        # Predict
         prediction = diabetes_model.predict([user_input])
-        if prediction[0]==1:
-            diabetes_result = "The person has diabetic"
-        else:
-            diabetes_result = "The person has no diabetic"
-    st.success(diabetes_result)
+        diabetes_result = "The person has diabetes." if prediction[0] == 1 else "The person does not have diabetes."
+        st.success(diabetes_result)
 
+# Heart Disease Prediction Section
 if selected == 'Heart Disease Prediction':
     st.title("Heart Disease Prediction Using Machine Learning")
-    col1, col2, col3  = st.columns(3)
+    st.write("### Fill in the details to determine the risk of heart disease.")
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        age = st.text_input("Age")
+        age = st.number_input("Age", min_value=0, step=1)
     with col2:
-        sex = st.text_input("Sex")
+        sex = st.selectbox("Sex", options=["Male", "Female"])
     with col3:
-        cp = st.text_input("Chest Pain Types")
+        cp = st.number_input("Chest Pain Types", min_value=0, step=1)
     with col1:
-        trestbps = st.text_input("Resting Blood Pressure")
+        trestbps = st.number_input("Resting Blood Pressure", min_value=0.0, format="%.2f")
     with col2:
-        chol = st.text_input("Serum Cholestroal in mg/dl")
+        chol = st.number_input("Serum Cholesterol in mg/dl", min_value=0.0, format="%.2f")
     with col3:
-        fbs = st.text_input('Fasting Blood Sugar > 120 mg/dl')
+        fbs = st.selectbox("Fasting Blood Sugar > 120 mg/dl", options=[0, 1])
     with col1:
-        restecg = st.text_input('Resting Electrocardiographic results')
-
+        restecg = st.number_input("Resting Electrocardiographic results", min_value=0, step=1)
     with col2:
-        thalach = st.text_input('Maximum Heart Rate achieved')
-
+        thalach = st.number_input("Maximum Heart Rate achieved", min_value=0.0, format="%.2f")
     with col3:
-        exang = st.text_input('Exercise Induced Angina')
-
+        exang = st.selectbox("Exercise Induced Angina", options=[0, 1])
     with col1:
-        oldpeak = st.text_input('ST depression induced by exercise')
-
+        oldpeak = st.number_input("ST depression induced by exercise", min_value=0.0, format="%.2f")
     with col2:
-        slope = st.text_input('Slope of the peak exercise ST segment')
-
+        slope = st.number_input("Slope of the peak exercise ST segment", min_value=0, step=1)
     with col3:
-        ca = st.text_input('Major vessels colored by flourosopy')
-
+        ca = st.number_input("Major vessels colored by fluoroscopy", min_value=0, step=1)
     with col1:
-        thal = st.text_input('thal: 0 = normal; 1 = fixed defect; 2 = reversable defect')
-    heart_disease_result = ""
-    if st.button("Heart Disease Test Result"):
-        user_input = [age,sex,cp,trestbps,chol,fbs,restecg,thalach,exang,oldpeak,slope,ca,thal]
-        user_input = [float(x) for x in user_input]
-        prediction = heart_disease_model.predict([user_input])
-        if prediction[0]==1:
-            heart_disease_result = "This person is having heart disease"
-        else:
-            heart_disease_result = "This person does not have any heart disease"
-    st.success(heart_disease_result)
-
-if selected == 'Kidney Disease Prediction':
+        thal = st.number_input("Thal: 0 = normal; 1 = fixed defect; 2 = reversible defect", min_value=0, max_value=2, step=1)
     
-    st.title("Kidney Disease Prediction using ML")
+    if st.button("Heart Disease Test Result"):
+        user_input = [age, sex == "Male", cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]
+        prediction = heart_disease_model.predict([user_input])
+        heart_disease_result = "This person has heart disease." if prediction[0] == 1 else "This person does not have heart disease."
+        st.success(heart_disease_result)
 
+# Kidney Disease Prediction Section
+if selected == 'Kidney Disease Prediction':
+    st.title("Kidney Disease Prediction Using Machine Learning")
+    st.write("### Enter the following information to check for kidney disease.")
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
-        age = st.text_input('Age')
-
+        age = st.number_input('Age', min_value=0, step=1)
     with col2:
-        blood_pressure = st.text_input('Blood Pressure')
-
+        blood_pressure = st.number_input('Blood Pressure', min_value=0.0, format="%.2f")
     with col3:
-        specific_gravity = st.text_input('Specific Gravity')
-
+        specific_gravity = st.number_input('Specific Gravity', min_value=0.0, format="%.2f")
     with col4:
-        albumin = st.text_input('Albumin')
-
+        albumin = st.number_input('Albumin', min_value=0, step=1)
     with col5:
-        sugar = st.text_input('Sugar')
-
+        sugar = st.number_input('Sugar', min_value=0, step=1)
     with col1:
-        red_blood_cells = st.text_input('Red Blood Cell')
-
+        red_blood_cells = st.selectbox('Red Blood Cells', options=['Normal', 'Abnormal'])
     with col2:
-        pus_cell = st.text_input('Pus Cell')
-
+        pus_cell = st.selectbox('Pus Cell', options=['Normal', 'Abnormal'])
     with col3:
-        pus_cell_clumps = st.text_input('Pus Cell Clumps')
-
+        pus_cell_clumps = st.selectbox('Pus Cell Clumps', options=['Present', 'Not Present'])
     with col4:
-        bacteria = st.text_input('Bacteria')
-
+        bacteria = st.selectbox('Bacteria', options=['Present', 'Not Present'])
     with col5:
-        blood_glucose_random = st.text_input('Blood Glucose Random')
-
+        blood_glucose_random = st.number_input('Blood Glucose Random', min_value=0.0, format="%.2f")
     with col1:
-        blood_urea = st.text_input('Blood Urea')
-
+        blood_urea = st.number_input('Blood Urea', min_value=0.0, format="%.2f")
     with col2:
-        serum_creatinine = st.text_input('Serum Creatinine')
-
+        serum_creatinine = st.number_input('Serum Creatinine', min_value=0.0, format="%.2f")
     with col3:
-        sodium = st.text_input('Sodium')
-
+        sodium = st.number_input('Sodium', min_value=0.0, format="%.2f")
     with col4:
-        potassium = st.text_input('Potassium')
-
+        potassium = st.number_input('Potassium', min_value=0.0, format="%.2f")
     with col5:
-        haemoglobin = st.text_input('Haemoglobin')
-
+        haemoglobin = st.number_input('Haemoglobin', min_value=0.0, format="%.2f")
     with col1:
-        packed_cell_volume = st.text_input('Packet Cell Volume')
-
+        packed_cell_volume = st.number_input('Packed Cell Volume', min_value=0, step=1)
     with col2:
-        white_blood_cell_count = st.text_input('White Blood Cell Count')
-
+        white_blood_cell_count = st.number_input('White Blood Cell Count', min_value=0, step=1)
     with col3:
-        red_blood_cell_count = st.text_input('Red Blood Cell Count')
-
+        red_blood_cell_count = st.number_input('Red Blood Cell Count', min_value=0.0, format="%.2f")
     with col4:
-        hypertension = st.text_input('Hypertension')
-
+        hypertension = st.selectbox('Hypertension', options=[0, 1])
     with col5:
-        diabetes_mellitus = st.text_input('Diabetes Mellitus')
-
+        diabetes_mellitus = st.selectbox('Diabetes Mellitus', options=[0, 1])
     with col1:
-        coronary_artery_disease = st.text_input('Coronary Artery Disease')
-
+        coronary_artery_disease = st.selectbox('Coronary Artery Disease', options=[0, 1])
     with col2:
-        appetite = st.text_input('Appetitte')
-
+        appetite = st.selectbox('Appetite', options=['Good', 'Poor'])
     with col3:
-        peda_edema = st.text_input('Peda Edema')
+        peda_edema = st.selectbox('Pedal Edema', options=[0, 1])
     with col4:
-        aanemia = st.text_input('Aanemia')
-
-    # code for Prediction
-    kindey_diagnosis = ''
-
-    # creating a button for Prediction    
+        aanemia = st.selectbox('Anemia', options=[0, 1])
+    
     if st.button("Kidney's Test Result"):
-
-        user_input = [age, blood_pressure, specific_gravity, albumin, sugar,
-       red_blood_cells, pus_cell, pus_cell_clumps, bacteria,
-       blood_glucose_random, blood_urea, serum_creatinine, sodium,
-       potassium, haemoglobin, packed_cell_volume,
-       white_blood_cell_count, red_blood_cell_count, hypertension,
-       diabetes_mellitus, coronary_artery_disease, appetite,
-       peda_edema, aanemia]
-
-        user_input = [float(x) for x in user_input]
-
+        user_input = [
+            age, blood_pressure, specific_gravity, albumin, sugar, 
+            1 if red_blood_cells == 'Normal' else 0, 
+            1 if pus_cell == 'Normal' else 0, 
+            1 if pus_cell_clumps == 'Present' else 0, 
+            1 if bacteria == 'Present' else 0,
+            blood_glucose_random, blood_urea, serum_creatinine, sodium,
+            potassium, haemoglobin, packed_cell_volume, white_blood_cell_count,
+            red_blood_cell_count, hypertension, diabetes_mellitus,
+            coronary_artery_disease, 1 if appetite == 'Good' else 0,
+            peda_edema, aanemia
+        ]
         prediction = kidney_disease_model.predict([user_input])
-
-        if prediction[0] == 1:
-            kindey_diagnosis = "The person has Kidney's disease"
-        else:
-            kindey_diagnosis = "The person does not have Kidney's disease"
-    st.success(kindey_diagnosis)
+        kidney_diagnosis = "The person has kidney disease." if prediction[0] == 1 else "The person does not have kidney disease."
+        st.success(kidney_diagnosis)
