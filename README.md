@@ -5,13 +5,13 @@ A user-friendly web application built with Streamlit for predicting multiple dis
 ## Features
 
 - **Diabetes Prediction:** Predicts the likelihood of diabetes based on input parameters such as glucose levels, insulin, BMI, and more.
-  [Diabetes Dataset Link](https://www.kaggle.com/datasets/mathchi/diabetes-data-set)
+- [Diabetes Dataset Link](https://www.kaggle.com/datasets/mathchi/diabetes-data-set)
   
 - **Heart Disease Prediction:** Assesses the risk of heart disease using data such as age, cholesterol levels, chest pain types, etc.
-  [Heart Disease Dataset Link](https://kaggle.com/datasets/johnsmith88/heart-disease-dataset)
-- 
+- [Heart Disease Dataset Link](https://kaggle.com/datasets/johnsmith88/heart-disease-dataset)
+  
 - **Kidney Disease Prediction:** Identifies the presence of kidney disease based on various health indicators like blood pressure, serum creatinine, and others.
-  [Kidney Disease Dataset Link](https://www.kaggle.com/datasets/mansoordaku/ckdisease)
+- [Kidney Disease Dataset Link](https://www.kaggle.com/datasets/mansoordaku/ckdisease)
 
 ## Tech Stack
 
