@@ -1,5 +1,7 @@
 # Multiple Disease Prediction Web Application 🩺
 
+**Live Project:** [AI-Based Multiple Disease Prediction](https://multi-diseases-prediction.streamlit.app/)
+
 A user-friendly web application built with Streamlit for predicting multiple diseases including Diabetes, Heart Disease, and Kidney Disease using machine learning models.
 
 ## Features
