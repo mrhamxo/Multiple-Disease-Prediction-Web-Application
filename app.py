@@ -2,15 +2,16 @@ import streamlit as st
 import pickle
 import os
 from streamlit_option_menu import option_menu
+import joblib
 
 # Set page configuration
 st.set_page_config(page_title="Multiple Disease Prediction", layout="wide", page_icon="🩺")
 
 # Load models
 working_dir = os.path.dirname(os.path.abspath(__file__))
-diabetes_model = pickle.load(open(f'{working_dir}/models/diabetes_models/knn_diabetes.pkl', 'rb'))
-heart_disease_model = pickle.load(open(f'{working_dir}/models/heart_models/lg_model.pkl', 'rb'))
-kidney_disease_model = pickle.load(open(f'{working_dir}/models/kidney_models/gb_kindey.pkl', 'rb'))
+diabetes_model = joblib.load(f'{working_dir}/models/diabetes_models/knn_diabetes.pkl')
+heart_disease_model = joblib.load(f'{working_dir}/models/heart_models/lg_model.pkl')
+kidney_disease_model = joblib.load(f'{working_dir}/models/kidney_models/gb_kindey.pkl')
 
 # Custom CSS for styling
 st.markdown(
